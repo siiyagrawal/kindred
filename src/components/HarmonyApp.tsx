@@ -364,6 +364,12 @@ function NetworkExplorer({ initial, onExit }: { initial: Person; onExit: () => v
     return () => window.removeEventListener("keydown", onKey);
   });
 
+  const promisingPath = defaultSelection && <>
+    <p className="text-[10px] font-semibold uppercase text-signal">A promising path</p>
+    <p className="mt-2 text-xs leading-5 text-paper/65"><strong className="text-paper">{defaultSelection.name}</strong> {defaultSelection.note}</p>
+    <p className="mt-2 flex min-w-0 items-center gap-2 truncate text-[10px] text-paper/45"><i className={cn("size-2 shrink-0 rounded-full", tierDot(defaultSelection.tier))} /> {tierNames[defaultSelection.tier]} · {defaultSelection.role}</p>
+  </>;
+
   return (
     <main className="min-h-screen overflow-hidden bg-ink text-paper">
       <header className="relative z-30 flex h-20 items-center justify-between border-b border-paper/10 px-5 sm:px-8">
@@ -452,14 +458,14 @@ function NetworkExplorer({ initial, onExit }: { initial: Person; onExit: () => v
             <span className="flex items-center gap-2"><i className="size-2 rounded-full bg-primary" /> Trusted</span>
             <span className="flex items-center gap-2"><i className="size-2 rounded-full bg-paper/40" /> Wider world</span>
           </div>
-          <div aria-live="polite" className="order-1 max-h-[55dvh] w-full overflow-y-auto rounded-md border border-paper/10 bg-paper/5 p-4 backdrop-blur-xl sm:order-2 sm:max-h-[60vh] sm:justify-self-end">
-            {selected ? (
-              <PersonDetailCard key={selected.id} person={selected} center={center} headingRef={headingRef} sent={sentIds.includes(selected.id)} onSent={() => setSentIds((ids) => [...ids, selected.id])} onViewWorld={() => moveTo(selected)} />
-            ) : defaultSelection && <>
-              <p className="text-[10px] font-semibold uppercase text-signal">A promising path</p>
-              <p className="mt-2 text-xs leading-5 text-paper/65"><strong className="text-paper">{defaultSelection.name}</strong> {defaultSelection.note}</p>
-              <p className="mt-2 flex min-w-0 items-center gap-2 truncate text-[10px] text-paper/45"><i className={cn("size-2 shrink-0 rounded-full", tierDot(defaultSelection.tier))} /> {tierNames[defaultSelection.tier]} · {defaultSelection.role}</p>
-            </>}
+          {/* The slot keeps the default card's height so the stage never resizes; taller cards grow upward over the network. */}
+          <div className="relative order-1 w-full sm:order-2 sm:justify-self-end">
+            <div aria-hidden="true" className="invisible rounded-md border p-4">{promisingPath}</div>
+            <div aria-live="polite" className="absolute inset-x-0 bottom-0 max-h-[55dvh] overflow-y-auto rounded-md border border-paper/10 bg-ink/85 p-4 backdrop-blur-xl sm:max-h-[60vh]">
+              {selected
+                ? <PersonDetailCard key={selected.id} person={selected} center={center} headingRef={headingRef} sent={sentIds.includes(selected.id)} onSent={() => setSentIds((ids) => [...ids, selected.id])} onViewWorld={() => moveTo(selected)} />
+                : promisingPath}
+            </div>
           </div>
         </div>
       </section>
